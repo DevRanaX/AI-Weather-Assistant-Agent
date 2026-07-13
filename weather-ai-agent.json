@@ -1,0 +1,171 @@
+{
+  "name": "My workflow 2",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -224,
+        -16
+      ],
+      "id": "3e3ccd9b-27c3-4f9d-8449-1581aefceec3",
+      "name": "When chat message received",
+      "webhookId": "393fdfa0-1559-4210-8504-e8f9de4395ee"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a helpful assistant\n\"If the user asks about the weather but doesn't mention a city, ask them which city they are in first before calling the tool.\"\n\ngive smart Recommendations\n-Agar temperature 40°C se oopar ho: User ko bolna ke \"Bhai dhoop tez hai, nimkol pi kar nikalna!\"\n\n-Agar baarish ke chances hon: \"Bhai chhatri (umbrella) sath rakhna mat bhoolna, motorcyle slow chalana.\"\n\n\n\nYou are a helpful, friendly, and witty Pakistani Weather Assistant. Your goal is to provide weather updates and fun, practical lifestyle recommendations based on the weather data.\n\nFollow these strict guidelines:\n1. Language: Always reply in Roman Urdu (using Urdu words in English script, like \"Bhai aaj Lahore mein dhoop hai...\") or Urdu, depending on the language the user is comfortable with. Keep the tone casual and energetic.\n2. Handling Missing Location: If the user asks about the weather (e.g., \"Bahar ka kya mahaul hai?\") but does NOT mention a city, do not call the weather tool. Instead, ask them politely in Roman Urdu which city they want to check.\n3. Smart Recommendations: Once you get the weather data using your tool, analyze it and give practical tips:\n   - If the temperature is above 35°C: Warn them about the heat, tell them to drink water/Nimkol, and avoid going out in the afternoon.\n   - If there is rain or high chance of rain: Warn them to keep an umbrella, drive their motorcycle slowly, and maybe suggest eating samosas/pakoras!\n   - If the weather is pleasant (20°C to 28°C): Suggest they go out for a walk or plan an outdoor activity."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "0e8edc20-9c9c-464d-9311-1e2e1a4c1583",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.1-8b-instant",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        256
+      ],
+      "id": "1958e38b-0cc2-409a-9a8d-d167b8237a5c",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "0Z19j3CXRtQ2QCdx",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "cityName": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('City', `“The city name extracted from the user's message (e.g., London, Lahore).”`, 'string') }}"
+      },
+      "type": "n8n-nodes-base.openWeatherMapTool",
+      "typeVersion": 1,
+      "position": [
+        480,
+        192
+      ],
+      "id": "f7669abe-51be-46a4-8e76-fc8786e61fff",
+      "name": "OpenWeatherMap",
+      "credentials": {
+        "openWeatherMapApi": {
+          "id": "JytqBLigUzt8RNFD",
+          "name": "OpenWeatherMap account 2"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        272,
+        256
+      ],
+      "id": "79b6707e-52b3-4892-9c2c-9e1568903382",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "model": "meta-llama/llama-3.1-8b-instruct",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        80,
+        208
+      ],
+      "id": "c7a5bc0b-278d-406b-bcb7-6579fcc40268",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "0TvfaEhbe7TyAATk",
+          "name": "OpenRouter account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "OpenWeatherMap": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "8c5429a0-4efc-4f12-97d8-288110f2695d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0411cbd218bf28bf51e91e1427809da8e77d537e96aa8dcbc85359e8dfdb6ee7"
+  },
+  "nodeGroups": [],
+  "id": "btZ0Elck6penGHgP",
+  "tags": []
+}
